@@ -11,11 +11,14 @@ import {
 } from "recharts";
 import { useAuth } from "../../AuthContext";
 import { GrEdit } from "react-icons/gr";
-import { FiArrowUp, FiArrowDown } from "react-icons/fi";
+import { BiDownArrowCircle, BiUpArrowCircle } from "react-icons/bi";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 import "./index.css";
 const Dashboard = () => {
   const { isAdmin, currentUser } = useAuth();
+  console.log("dashboard-----is admin-----", isAdmin);
+  console.log("dashboard------", currentUser);
 
   const [totalCredit, setTotalCredit] = useState(0);
   const [totalDebit, setTotalDebit] = useState(0);
@@ -27,11 +30,6 @@ const Dashboard = () => {
     const date = new Date(dateString);
     return format(date, "dd MMM, hh:mm a");
   };
-
-  //   code successed
-  //   useEffect(() => {
-  //     fetchAdminData();
-  //   }, []);
 
   useEffect(() => {
     if (isAdmin) {
@@ -59,7 +57,6 @@ const Dashboard = () => {
       console.log("Admin Data:", data);
       setTotalCredit(calculateTotalCredit(data.transaction_totals_admin));
       setTotalDebit(calculateTotalDebit(data.transaction_totals_admin));
-
       // Rest of the code to handle the data
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -71,12 +68,17 @@ const Dashboard = () => {
     "https://bursting-gelding-24.hasura.app/api/rest/credit-debit-totals";
   const fetchNonAdminData = async () => {
     try {
+      if (!currentUser) {
+        console.error("Invalid currentUser data:", currentUser);
+        return;
+      }
+      const userId = currentUser;
       const headers = {
         "Content-Type": "application/json",
         "x-hasura-admin-secret":
           "g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF",
         "x-hasura-role": "user",
-        "x-hasura-user-id": currentUser?.id || "",
+        "x-hasura-user-id": userId,
       };
 
       const response = await fetch(non_admin_tcd_url, { headers });
@@ -92,17 +94,15 @@ const Dashboard = () => {
   };
 
   const getRecentTransactions = async () => {
-    const limit = 3; // Get the latest 3 transactions
-    const offset = 0; // Start from the first transaction
+    const limit = 3;
+    const offset = 0;
     const apiUrl = `https://bursting-gelding-24.hasura.app/api/rest/all-transactions?limit=${limit}&offset=${offset}`;
-    // const apiUrl =
-    //   "https://bursting-gelding-24.hasura.app/api/rest/all-transactions";
     const headers = {
       "Content-Type": "application/json",
       "x-hasura-admin-secret":
         "g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF",
       "x-hasura-role": isAdmin ? "admin" : "user",
-      "x-hasura-user-id": currentUser?.id || "",
+      "x-hasura-user-id": currentUser,
     };
 
     try {
@@ -115,18 +115,6 @@ const Dashboard = () => {
       console.error("Error fetching recent transactions:", error);
     }
   };
-
-  //   const calculateTotalCredit = (data) => {
-  //     return data
-  //       .filter((item) => item.type === "credit")
-  //       .reduce((sum, item) => sum + item.sum, 0);
-  //   };
-
-  //   const calculateTotalDebit = (data) => {
-  //     return data
-  //       .filter((item) => item.type === "debit")
-  //       .reduce((sum, item) => sum + item.sum, 0);
-  //   };
 
   const calculateTotalCredit = (data) => {
     let totalCredit = 0;
@@ -161,25 +149,26 @@ const Dashboard = () => {
   };
 
   const getAmountColor = (type) => {
-    return type === "credit" ? "green" : "red";
+    return type === "credit" ? "red" : "green";
   };
 
   const getIconColor = (type) => {
-    return type === "credit" ? "blue" : "red";
+    return type === "credit" ? "red" : "green";
   };
 
-  //   code okay---------
   return (
     <div>
       <div className="top_container">
-        <h3>Accounts</h3>
-        <button className="add_transaction_button">+ Add Transaction</button>
+        <h2>Accounts</h2>
+        <button type="button" className="add_transaction_button">
+          + Add Transaction
+        </button>
       </div>
 
       <div className="total_credits_debits_container">
         <div className="credits">
           <div>
-            <h1>{totalCredit}</h1>
+            <h1>${totalCredit}</h1>
             <p>Credit</p>
           </div>
           <img
@@ -190,7 +179,7 @@ const Dashboard = () => {
         </div>
         <div className="debits">
           <div>
-            <h1>{totalDebit}</h1>
+            <h1>${totalDebit}</h1>
             <p>Debit</p>
           </div>
           <img
@@ -203,28 +192,43 @@ const Dashboard = () => {
 
       <div className="last_transactions_container">
         <h1>Last Transaction </h1>
-
-        <p> display the api transaction data here</p>
         <ul>
-          {recentTransactions.map((transaction) => (
-            <li key={transaction.id}>
-              <p>{transaction.transaction_name}</p>
-              <p>{transaction.category}</p>
-              <p>{formatDate(transaction.date)}</p>
-              <p style={{ color: getAmountColor(transaction.type) }}>
-                {transaction.type === "credit" ? (
-                  <FiArrowUp
-                    style={{ color: getIconColor(transaction.type) }}
-                  />
-                ) : (
-                  <FiArrowDown
-                    style={{ color: getIconColor(transaction.type) }}
-                  />
-                )}
-                {transaction.amount}
-              </p>
-            </li>
-          ))}
+          {recentTransactions &&
+            recentTransactions.map((transaction) => (
+              <React.Fragment key={transaction.id}>
+                <li key={transaction.id}>
+                  <p>
+                    {transaction.type === "credit" ? (
+                      <BiUpArrowCircle
+                        size={28}
+                        style={{ color: getIconColor(transaction.type) }}
+                      />
+                    ) : (
+                      <BiDownArrowCircle
+                        size={28}
+                        style={{ color: getIconColor(transaction.type) }}
+                      />
+                    )}
+                  </p>
+                  <p className="items">{transaction.transaction_name}</p>
+                  <p className="items">{transaction.category}</p>
+                  <p className="items">{formatDate(transaction.date)}</p>
+                  <p
+                    className="items"
+                    style={{ color: getAmountColor(transaction.type) }}
+                  >
+                    -${transaction.amount}
+                  </p>
+                  <button type="button" className="edit_button">
+                    <GrEdit size={18} />
+                  </button>
+                  <button type="button" className="edit_button">
+                    <RiDeleteBinLine size={19} style={{ color: "red" }} />
+                  </button>
+                </li>
+                <hr />
+              </React.Fragment>
+            ))}
         </ul>
       </div>
 

@@ -6,14 +6,17 @@
   padding: 20px;
 }
 
-.top_container button {
+.add_transaction_button {
   background-color: blue;
   color: white;
   border-radius: 10px;
   border: none;
   font-weight: bold;
   font-size: 10px;
-  padding: 5px 5px 5px 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 0;
+  padding-top: 0;
 }
 
 .total_credits_debits_container {
@@ -31,12 +34,13 @@
   border-radius: 10px;
   box-shadow: 0px 0px 0px 1px #f1efef;
   padding: 10px 20px 20px 10px;
+  width: 45%;
 }
 
-.credits h1 {
+.credits div h1 {
   color: rgb(48, 234, 48);
   font-weight: bold;
-  font-size: 24px;
+  font-size: 35px;
 }
 
 .tcb_img {
@@ -52,16 +56,30 @@
   border-radius: 10px;
   box-shadow: 0px 0px 0px 1px #f1efef;
   padding: 10px 20px 20px 10px;
+  width: 45%;
 }
 
-.debits h1 {
+.debits div h1 {
   color: rgb(241, 16, 185);
   font-weight: bold;
-  font-size: 24px;
+  font-size: 35px;
 }
 
 .last_transactions_container ul li {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.items {
+  width: 200px;
+}
+
+.edit_button {
+  border: none;
+  background-color: transparent;
+}
+
+.last_transactions_container ul hr {
+  color: rgb(246, 246, 246);
 }
