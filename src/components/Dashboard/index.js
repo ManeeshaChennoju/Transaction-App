@@ -214,8 +214,12 @@ const Dashboard = () => {
     }
   };
 
+  const capitalizeFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
   return (
-    <div>
+    <div className="dashboard_container">
       <div className="top_container">
         <h2>Accounts</h2>
         <button type="button" className="add_transaction_button">
@@ -249,7 +253,7 @@ const Dashboard = () => {
       </div>
 
       <div className="last_transactions_container">
-        <h1>Last Transaction </h1>
+        <h2>Last Transaction </h2>
         <ul>
           {recentTransactions &&
             recentTransactions.map((transaction) => (
@@ -268,8 +272,12 @@ const Dashboard = () => {
                       />
                     )}
                   </p>
-                  <p className="items">{transaction.transaction_name}</p>
-                  <p className="items">{transaction.category}</p>
+                  <p className="items">
+                    {capitalizeFirstLetter(transaction.transaction_name)}
+                  </p>
+                  <p className="items">
+                    {capitalizeFirstLetter(transaction.category)}
+                  </p>
                   <p className="items">{formatDate(transaction.date)}</p>
                   <p
                     className="items"
@@ -291,7 +299,7 @@ const Dashboard = () => {
       </div>
 
       <div className="barchart_container">
-        <h1>Debit & Credit Overview</h1>
+        <h2>Debit & Credit Overview</h2>
         <h4 style={{ marginBottom: "10px" }}>
           {`$${totalDebitBarchart} Debited & $${totalCreditBarchart} Credited in this Week`}
         </h4>

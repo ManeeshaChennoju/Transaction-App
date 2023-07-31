@@ -1,0 +1,168 @@
+.main-container {
+  background-color: rgba(220, 236, 243, 0.855);
+  min-height: 100%;
+}
+
+.container {
+  position: sticky;
+  background-color: #fff;
+  width: 100%;
+  top: 0;
+}
+
+.top_container {
+  display: flex;
+  /* padding: 14px 40px 0px 40px; */
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.add_transaction_button {
+  padding: 10px;
+}
+
+.tabs_container {
+  width: 100%;
+  padding: 16px 0;
+  display: flex;
+  justify-content: center;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 80px;
+  z-index: 1;
+}
+
+.transactions_container {
+  width: 100%;
+  max-height: calc(
+    100vh - 168px
+  ); /* Adjust as needed to leave space for top_container and tabs_container */
+  overflow-y: auto;
+  padding: 16px 40px;
+}
+
+.all_transactions_container {
+  list-style-type: none;
+  padding: 10px;
+  margin-left: 20px;
+  background-color: rgb(229, 238, 248);
+  display: flex;
+  flex-direction: column;
+  width: 1110px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.li_container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.headings_container {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  justify-content: space-around;
+}
+
+.arrows {
+  width: 40px;
+}
+
+.li_name {
+  width: 317px;
+  height: 19px;
+}
+
+.li_category {
+  width: 72px;
+  height: 19px;
+  padding-left: 0;
+}
+
+.li_date {
+  width: 131;
+  height: 19px;
+}
+
+.li_amount {
+  width: 63px;
+  height: 19px;
+  padding-left: 80px;
+}
+
+.edit_button {
+  width: 30px;
+  height: 30px;
+  margin-right: 20px;
+}
+
+.name {
+  width: 147px;
+  height: 19px;
+}
+
+.category {
+  width: 72px;
+  height: 19px;
+}
+
+.date {
+  width: 36px;
+  height: 19px;
+}
+
+.amount {
+  width: 61px;
+  height: 19px;
+}
+
+/* table */
+
+.table_container {
+  height: 580px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+table {
+  width: 97%;
+  margin: 20px;
+  box-shadow: 0px 1px 1px 1px #f1efef;
+  border: solid 1px block;
+  padding: 18px;
+  background-color: #ffffff;
+  border-radius: 13px;
+}
+
+th {
+  text-align: start;
+}
+
+th td {
+  padding-left: 10px;
+}
+
+.transaction_name {
+  padding-left: 20px;
+}
+
+th {
+  border-radius: 5px;
+}
+
+tbody tr td {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+tbody {
+  overflow-y: scroll;
+  height: 100%;
+}

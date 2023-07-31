@@ -14,7 +14,7 @@ const AllTransactions = () => {
         "https://bursting-gelding-24.hasura.app/api/rest/all-transactions"
       );
       const data = await response.json();
-
+      console.log("All Transactions data------", data);
       // Sample data for testing
       setTransactions(data || []);
     } catch (error) {
@@ -24,18 +24,7 @@ const AllTransactions = () => {
 
   return (
     <div>
-      <h2>All Transactions</h2>
-      <ul>
-        {transactions.map((transaction) => (
-          <li key={transaction.id}>
-            <span>{transaction.userName}</span>
-            <span>{transaction.transactionName}</span>
-            <span>{transaction.category}</span>
-            <span>{transaction.amount}</span>
-            <span>{transaction.date}</span>
-          </li>
-        ))}
-      </ul>
+      <h1 className="tabs_container">All transactions</h1>
     </div>
   );
 };
