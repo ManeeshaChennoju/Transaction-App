@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import React, { useState, useEffect } from "react";
 import {
   BarChart,
@@ -8,6 +8,8 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  Label,
+  ResponsiveContainer,
 } from "recharts";
 import { useAuth } from "../../AuthContext";
 import { GrEdit } from "react-icons/gr";
@@ -25,6 +27,9 @@ const Dashboard = () => {
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [chartData, setChartData] = useState([]);
 
+  const [totalCreditBarchart, setTotalCreditBarchart] = useState(0);
+  const [totalDebitBarchart, setTotalDebitBarchart] = useState(0);
+
   // Function to format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -38,6 +43,7 @@ const Dashboard = () => {
       fetchNonAdminData();
     }
     getRecentTransactions();
+    fetchChartData();
   }, [isAdmin, currentUser]);
 
   const admin_tcd_url =
@@ -156,6 +162,58 @@ const Dashboard = () => {
     return type === "credit" ? "red" : "green";
   };
 
+  const fetchChartData = async () => {
+    try {
+      const apiUrl = isAdmin
+        ? "https://bursting-gelding-24.hasura.app/api/rest/daywise-totals-last-7-days-admin"
+        : "https://bursting-gelding-24.hasura.app/api/rest/daywise-totals-7-days";
+
+      const headers = {
+        "Content-Type": "application/json",
+        "x-hasura-admin-secret":
+          "g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF",
+        "x-hasura-role": isAdmin ? "admin" : "user",
+        "x-hasura-user-id": currentUser,
+      };
+
+      const response = await fetch(apiUrl, { headers });
+      const data = await response.json();
+      console.log("Bar Chart Data:", data);
+
+      // Process the data and update chartData state accordingly
+      const processedData = isAdmin
+        ? data.last_7_days_transactions_totals_admin.map((item) => ({
+            date: formatDate(parseISO(item.date), "eee"),
+            [item.type]: item.sum, // Dynamically set the credit/debit based on the type
+          }))
+        : data.last_7_days_transactions_credit_debit_totals.map((item) => ({
+            date: formatDate(parseISO(item.date), "eee"),
+            [item.type]: item.sum, // Dynamically set the credit/debit based on the type
+          }));
+
+      // Calculate the total credit and total debit sums separately
+      let totalCreditSum = 0;
+      let totalDebitSum = 0;
+
+      processedData.forEach((item) => {
+        if (item.credit) {
+          totalCreditSum += item.credit;
+        }
+        if (item.debit) {
+          totalDebitSum += item.debit;
+        }
+      });
+
+      setTotalCreditBarchart(totalCreditSum);
+      setTotalDebitBarchart(totalDebitSum);
+
+      setChartData(processedData);
+    } catch (error) {
+      console.error("Error fetching bar chart data:", error);
+      // Handle error, show error message to the user, etc.
+    }
+  };
+
   return (
     <div>
       <div className="top_container">
@@ -232,9 +290,31 @@ const Dashboard = () => {
         </ul>
       </div>
 
-      <div className="barchart_container"></div>
+      <div className="barchart_container">
+        <h1>Debit & Credit Overview</h1>
+        <h4 style={{ marginBottom: "10px" }}>
+          {`$${totalDebitBarchart} Debited & $${totalCreditBarchart} Credited in this Week`}
+        </h4>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart width={500} height={400} data={chartData}>
+            <CartesianGrid strokeDasharray="2 2" />
+            <XAxis
+              dataKey="date"
+              tickFormatter={(value) => value.toUpperCase()}
+            />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="credit" stackId="a" fill="#FCAA0B" />
+            <Bar dataKey="debit" stackId="a" fill="#4D78FF" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };
 
 export default Dashboard;
+
+// -------------------------------------------------------------
+// -------------------------------------------------------------

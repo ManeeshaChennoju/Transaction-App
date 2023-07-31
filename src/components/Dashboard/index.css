@@ -83,3 +83,9 @@
 .last_transactions_container ul hr {
   color: rgb(246, 246, 246);
 }
+
+.barchart_container {
+  width: 1110px;
+  height: 364px;
+  flex-shrink: 0;
+}
