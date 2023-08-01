@@ -15,6 +15,9 @@ import { useAuth } from "../../AuthContext";
 import { GrEdit } from "react-icons/gr";
 import { BiDownArrowCircle, BiUpArrowCircle } from "react-icons/bi";
 import { RiDeleteBinLine } from "react-icons/ri";
+import AddTransaction from "../AddTransaction";
+import UpdateTransaction from "../UpdateTransaction";
+import DeleteTransaction from "../DeleteTransaction";
 
 import "./index.css";
 const Dashboard = () => {
@@ -218,13 +221,112 @@ const Dashboard = () => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
+  //   handling add transaction
+
+  const handleAddTransaction = async (newTransaction) => {
+    try {
+      const apiUrl =
+        "https://bursting-gelding-24.hasura.app/api/rest/add-transaction";
+      const headers = {
+        "Content-Type": "application/json",
+        "x-hasura-admin-secret":
+          "g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF",
+        "x-hasura-role": "user",
+        "x-hasura-user-id": currentUser,
+      };
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(newTransaction),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add transaction");
+      } else {
+        alert("Transaction added successfully!");
+      }
+
+      //   fetchData();
+      getRecentTransactions();
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+    }
+  };
+
+  // Function to handle the update API call
+  const handleUpdateTransaction = async (updatedTransaction) => {
+    try {
+      const apiUrl =
+        "https://bursting-gelding-24.hasura.app/api/rest/update-transaction";
+      const headers = {
+        "Content-Type": "application/json",
+        "x-hasura-admin-secret":
+          "g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF",
+        "x-hasura-role": "user",
+        "x-hasura-user-id": currentUser,
+      };
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(updatedTransaction),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update transaction");
+      } else {
+        alert("Transaction updated successfully!");
+      }
+
+      getRecentTransactions();
+      fetchChartData();
+    } catch (error) {
+      console.error("Error updating transaction:", error);
+    }
+  };
+
+  //   handle delete transaction api call
+  const handleDeleteTransaction = async (transactionId) => {
+    try {
+      const response = await fetch(
+        `https://bursting-gelding-24.hasura.app/api/rest/delete-transaction`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            "x-hasura-admin-secret":
+              "g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF",
+            "x-hasura-role": "user",
+            "x-hasura-user-id": currentUser,
+          },
+          body: JSON.stringify({
+            id: transactionId,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        alert("Transaction deleted successfully!");
+
+        setRecentTransactions((prevTransactions) =>
+          prevTransactions.filter(
+            (transaction) => transaction.id !== transactionId
+          )
+        );
+      } else {
+        alert("Failed to  deleted Transaction!");
+      }
+    } catch (error) {
+      console.log("An error occurred while deleting the transaction");
+    }
+  };
+
   return (
     <div className="dashboard_container">
       <div className="top_container">
         <h2>Accounts</h2>
-        <button type="button" className="add_transaction_button">
-          + Add Transaction
-        </button>
+        {!isAdmin && <AddTransaction onAddTransaction={handleAddTransaction} />}
       </div>
 
       <div className="total_credits_debits_container">
@@ -285,12 +387,28 @@ const Dashboard = () => {
                   >
                     -${transaction.amount}
                   </p>
-                  <button type="button" className="edit_button">
-                    <GrEdit size={18} />
-                  </button>
-                  <button type="button" className="edit_button">
-                    <RiDeleteBinLine size={19} style={{ color: "red" }} />
-                  </button>
+
+                  {isAdmin ? (
+                    <button type="button" className="edit_button">
+                      <GrEdit size={18} />
+                    </button>
+                  ) : (
+                    <UpdateTransaction
+                      transaction={transaction}
+                      onUpdateTransaction={handleUpdateTransaction}
+                    />
+                  )}
+
+                  {isAdmin ? (
+                    <button type="button" className="delete_button">
+                      <RiDeleteBinLine size={19} style={{ color: "red" }} />
+                    </button>
+                  ) : (
+                    <DeleteTransaction
+                      transaction={transaction}
+                      onDeleteTransaction={handleDeleteTransaction}
+                    />
+                  )}
                 </li>
                 <hr />
               </React.Fragment>
@@ -323,6 +441,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-// -------------------------------------------------------------
-// -------------------------------------------------------------

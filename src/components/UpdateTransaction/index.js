@@ -1,106 +1,167 @@
 import React, { useState } from "react";
+import { GrEdit } from "react-icons/gr";
+import { BiDownArrowCircle, BiUpArrowCircle } from "react-icons/bi";
+import { RiDeleteBinLine } from "react-icons/ri";
+import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
 
-const UpdateTransaction = () => {
-  const [formData, setFormData] = useState({
-    transactionName: "",
-    transactionType: "",
-    transactionCategory: "",
-    amount: "",
-    date: "",
-  });
+const UpdateTransactionForm = ({
+  transaction,
+  onClose,
+  onUpdateTransaction,
+}) => {
+  // State for form fields
+  const [transactionName, setTransactionName] = useState(transaction.name);
+  const [transactionType, setTransactionType] = useState(transaction.type);
+  const [transactionCategory, setTransactionCategory] = useState(
+    transaction.category
+  );
+  const [amount, setAmount] = useState(transaction.amount.toString());
+  const [date, setDate] = useState(transaction.date.slice(0, 10));
+  const [error, setError] = useState("");
+  const maxTransactionNameLength = 30;
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
+  const handleUpdateTransaction = (e) => {
     e.preventDefault();
-    try {
-      // Perform validations on formData here
 
-      // Make API call to update transaction with formData
-      await fetch(
-        "https://bursting-gelding-24.hasura.app/api/rest/update-transaction",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      // Show toast message on successful update
-      // Fetch updated transactions after update
-      // Update transaction list and total amounts in Dashboard
-    } catch (error) {
-      console.error("Error updating transaction:", error);
+    if (!transactionName || !transactionCategory || !amount || !date) {
+      setError("All fields are required");
+      return;
     }
+
+    if (transactionName.length > maxTransactionNameLength) {
+      setError(
+        `Transaction Name should be max ${maxTransactionNameLength} characters`
+      );
+      return;
+    }
+
+    if (isNaN(amount) || parseFloat(amount) <= 0) {
+      setError("Amount should be a numeric value greater than zero");
+      return;
+    }
+
+    setError("");
+
+    const updatedTransaction = {
+      id: transaction.id,
+      name: transactionName,
+      type: transactionType.toLowerCase(),
+      category: transactionCategory,
+      amount: parseFloat(amount),
+      date: new Date(date).toISOString(),
+    };
+
+    onUpdateTransaction(updatedTransaction);
+    onClose();
   };
 
   return (
-    <div>
-      <h2>Update Transaction</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Transaction Name:
+    <div className="update_transaction_form">
+      <form onSubmit={handleUpdateTransaction}>
+        <h2>Edit Transaction</h2>
+        {error && <p className="error">{error}</p>}
+        <div className="form_group">
+          <label htmlFor="name">Transaction Name</label>
+          <br />
           <input
             type="text"
-            name="transactionName"
-            value={formData.transactionName}
-            onChange={handleChange}
-            required
+            id="name"
+            value={transactionName}
+            placeholder="Enter Name"
+            onChange={(e) => setTransactionName(e.target.value)}
           />
-        </label>
-        <label>
-          Transaction Type:
+        </div>
+        <div className="form_group">
+          <label>Transaction Type</label>
+          <br />
           <select
-            name="transactionType"
-            value={formData.transactionType}
-            onChange={handleChange}
-            required
+            value={transactionType}
+            placeholder="Select Transaction Type"
+            onChange={(e) => setTransactionType(e.target.value)}
           >
-            <option value="">Select Type</option>
-            <option value="Credit">Credit</option>
-            <option value="Debit">Debit</option>
+            <option value="credit">Credit</option>
+            <option value="debit">Debit</option>
           </select>
-        </label>
-        <label>
-          Transaction Category:
+        </div>
+        <div className="form_group">
+          <label>Category</label>
+          <br />
           <select
-            name="transactionCategory"
-            value={formData.transactionCategory}
-            onChange={handleChange}
-            required
+            value={transactionCategory}
+            onChange={(e) => setTransactionCategory(e.target.value)}
           >
             <option value="">Select Category</option>
-            {/* Add options for categories */}
+            <option value="entertainment">Entertainment</option>
+            <option value="food">Food</option>
+            <option value="shopping">Shopping</option>
+            {/* Add other options here */}
           </select>
-        </label>
-        <label>
-          Amount:
+        </div>
+        <div className="form_group">
+          <label>Amount</label>
+          <br />
           <input
             type="number"
-            name="amount"
-            value={formData.amount}
-            onChange={handleChange}
-            required
+            value={amount}
+            placeholder="Enter Your Amount"
+            onChange={(e) => setAmount(e.target.value)}
           />
-        </label>
-        <label>
-          Date:
+        </div>
+        <div className="form_group">
+          <label>Date</label>
+          <br />
           <input
             type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            required
+            value={date}
+            placeholder="Select Date"
+            onChange={(e) => setDate(e.target.value)}
           />
-        </label>
-        <button type="submit">Update Transaction</button>
+        </div>
+        <div className="form_group">
+          <button type="submit" className="form_update_button">
+            Update Transaction
+          </button>
+          <button
+            type="button"
+            className="form_cancel_button"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
+  );
+};
+
+const UpdateTransaction = ({ transaction, onUpdateTransaction }) => {
+  return (
+    <Popup
+      trigger={
+        <button type="button" className="edit_button">
+          <GrEdit size={18} />
+        </button>
+      }
+      modal
+      nested
+      closeOnDocumentClick={false}
+    >
+      {(close) => (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <button className="close" onClick={close}>
+              &times;
+            </button>
+            <UpdateTransactionForm
+              transaction={transaction}
+              onClose={close}
+              onUpdateTransaction={onUpdateTransaction}
+            />
+          </div>
+        </div>
+      )}
+    </Popup>
   );
 };
 

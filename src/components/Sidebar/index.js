@@ -1,12 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FiHome, FiList, FiUser, FiLogOut } from "react-icons/fi";
-import { useAuth } from "../../AuthContext"; // Import the AuthContext
+import { useAuth } from "../../AuthContext";
 
 import "./index.css";
 
 const Sidebar = ({ onLogout }) => {
-  const { isAdmin } = useAuth(); // Get the isAdmin value from the AuthContext
+  const { isAdmin, currentUser } = useAuth();
 
   return (
     <div className="sidebar">
@@ -20,7 +20,10 @@ const Sidebar = ({ onLogout }) => {
           <FiHome className="sidebar-icon" />
           <span className="sidebar-text">Dashboard</span>
         </Link>
-        <Link to="/transactions" className="sidebar-item">
+        <Link
+          to={isAdmin ? "/all-transactions" : "/transactions"}
+          className="sidebar-item"
+        >
           <FiList className="sidebar-icon" />
           <span className="sidebar-text">
             {isAdmin ? "All Transactions" : "Transactions"}

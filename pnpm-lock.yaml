@@ -11,6 +11,7 @@ specifiers:
   react-icons: ^4.10.1
   react-router-dom: ^6.14.2
   react-scripts: 5.0.1
+  reactjs-popup: ^2.0.5
   recharts: ^2.7.2
   web-vitals: ^2.1.4
 
@@ -25,6 +26,7 @@ dependencies:
   react-icons: 4.10.1_react@18.2.0
   react-router-dom: 6.14.2_react-dom@18.2.0+react@18.2.0
   react-scripts: 5.0.1_react@18.2.0
+  reactjs-popup: 2.0.5_react-dom@18.2.0+react@18.2.0
   recharts: 2.7.2_react-dom@18.2.0+react@18.2.0
   web-vitals: 2.1.4
 
@@ -8952,6 +8954,17 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       loose-envify: 1.4.0
+    dev: false
+
+  /reactjs-popup/2.0.5_react-dom@18.2.0+react@18.2.0:
+    resolution: {integrity: sha512-b5hv9a6aGsHEHXFAgPO5s1Jw1eSkopueyUVxQewGdLgqk2eW0IVXZrPRpHR629YcgIpC2oxtX8OOZ8a7bQJbxA==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: '>=16'
+      react-dom: '>=16'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /read-cache/1.0.0:

@@ -90,6 +90,11 @@
   background-color: transparent;
 }
 
+.delete_button {
+  border: none;
+  background-color: transparent;
+}
+
 .last_transactions_container ul hr {
   color: rgb(246, 246, 246);
 }
