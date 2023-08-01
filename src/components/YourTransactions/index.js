@@ -7,11 +7,14 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import AddTransaction from "../AddTransaction";
+import UpdateTransaction from "../UpdateTransaction";
+import DeleteTransaction from "../DeleteTransaction";
+
 import "./index.css";
 
 const YourTransactions = () => {
   const [transactions, setTransactions] = useState([]);
-  const { currentUser } = useAuth();
+  const { isAdmin, currentUser } = useAuth();
   const [tabValue, setTabValue] = useState(0);
 
   // Function to format date
@@ -118,6 +121,73 @@ const YourTransactions = () => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
+  //   Handling Update transaction
+  const handleUpdateTransaction = async (updatedTransaction) => {
+    try {
+      const apiUrl =
+        "https://bursting-gelding-24.hasura.app/api/rest/update-transaction";
+      const headers = {
+        "Content-Type": "application/json",
+        "x-hasura-admin-secret":
+          "g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF",
+        "x-hasura-role": "user",
+        "x-hasura-user-id": currentUser,
+      };
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(updatedTransaction),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update transaction");
+      } else {
+        alert("Transaction Updated Successfully!");
+      }
+
+      fetchData();
+    } catch (error) {
+      console.error("Error updating transaction:", error);
+    }
+  };
+
+  //   Handling Delete transaction
+  const handleDeleteTransaction = async (transactionId) => {
+    try {
+      const response = await fetch(
+        `https://bursting-gelding-24.hasura.app/api/rest/delete-transaction`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            "x-hasura-admin-secret":
+              "g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF",
+            "x-hasura-role": "user",
+            "x-hasura-user-id": currentUser,
+          },
+          body: JSON.stringify({
+            id: transactionId,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        alert("Transaction Deleted Successfully!");
+
+        setTransactions((prevTransactions) =>
+          prevTransactions.filter(
+            (transaction) => transaction.id !== transactionId
+          )
+        );
+      } else {
+        alert("Failed to  deleted Transaction!");
+      }
+    } catch (error) {
+      console.log("An error occurred while deleting the transaction");
+    }
+  };
+
   return (
     <div className="main-container">
       <div className="container">
@@ -177,12 +247,26 @@ const YourTransactions = () => {
                       -${transaction.amount}
                     </td>
                     <td>
-                      <button type="button" className="edit_button">
-                        <GrEdit size={18} />
-                      </button>
-                      <button type="button" className="edit_button">
-                        <RiDeleteBinLine size={19} style={{ color: "red" }} />
-                      </button>
+                      {isAdmin ? (
+                        <button type="button" className="edit_button">
+                          <GrEdit size={18} />
+                        </button>
+                      ) : (
+                        <UpdateTransaction
+                          transaction={transaction}
+                          onUpdateTransaction={handleUpdateTransaction}
+                        />
+                      )}
+                      {isAdmin ? (
+                        <button type="button" className="delete_button">
+                          <RiDeleteBinLine size={19} style={{ color: "red" }} />
+                        </button>
+                      ) : (
+                        <DeleteTransaction
+                          transaction={transaction}
+                          onDeleteTransaction={handleDeleteTransaction}
+                        />
+                      )}
                     </td>
                   </tr>
                 </React.Fragment>

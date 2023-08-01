@@ -21,25 +21,20 @@ const App = () => {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setError("Please enter both email and password.");
+      setError("Please Enter Both Email and Password.");
       return;
     }
-
-    // Call the login method from the AuthContext
     await login(email, password);
   };
 
   const handleLogout = () => {
-    // Call the logout method from the AuthContext
     logout();
   };
 
   return (
     <Router>
       <div className="app-container">
-        {/* If the user is logged in, render the Sidebar component */}
         {isLoggedIn && <Sidebar isAdmin={isAdmin} onLogout={handleLogout} />}
-
         <div className="content-container">
           {isLoggedIn ? (
             <Routes>
@@ -56,7 +51,6 @@ const App = () => {
                 path="/profile"
                 element={<Profile currentUser={currentUser} />}
               />
-              {/* We can add more routes here if needed */}
             </Routes>
           ) : (
             <div className="login-container">
@@ -65,20 +59,32 @@ const App = () => {
                 alt="Login"
                 className="login-image"
               />
-              <input
-                type="text"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              {error && <div className="error">{error}</div>}
-              <button onClick={handleLogin}>Login</button>
+              <div className="login-form">
+                <div className="login-form-group">
+                  <label htmlFor="email">Email</label>
+                  <input
+                    type="text"
+                    id="email"
+                    value={email}
+                    placeholder="Enter Your Email"
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="login-form-group">
+                  <label htmlFor="password">Password</label>
+                  <input
+                    type="password"
+                    id="password"
+                    value={password}
+                    placeholder="Enter Your Password"
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+                {error && <div className="error">*{error}</div>}
+                <button onClick={handleLogin} className="login_button">
+                  Login
+                </button>
+              </div>
             </div>
           )}
         </div>

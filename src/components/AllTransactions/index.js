@@ -236,14 +236,6 @@ const AllTransactions = () => {
                       {capitalizeFirstLetter(userName)}
                     </span>
                   </td>
-                  {/* <td className="user-info">
-                    <img
-                      src={user?.profileImg}
-                      alt="Profile"
-                      className="profile-image"
-                    />
-                    <span className="user-name">{user?.email}</span>
-                  </td> */}
                   <td>{capitalizeFirstLetter(transaction.transaction_name)}</td>
                   <td>{capitalizeFirstLetter(transaction.category)}</td>
                   <td style={{ color: getAmountColor(transaction.type) }}>

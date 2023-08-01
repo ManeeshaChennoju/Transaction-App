@@ -1,10 +1,40 @@
 /* sidebar.css */
 .sidebar {
   flex: 0 0 250px;
-  background-color: #333;
-  color: #fff;
+  color: #333;
+  background-color: #fff;
   display: flex;
   flex-direction: column;
+  text-decoration: none;
+}
+
+.sidebar_logo_container {
+  display: flex;
+  align-items: center;
+}
+
+.sidebar_logo_container img {
+  width: 44px;
+  height: 37.998px;
+  margin-right: 6px;
+}
+
+.Money {
+  color: #f89a23;
+  font-family: Poppins;
+  font-size: 19.66px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+}
+
+.Matters {
+  color: #02969c;
+  font-family: Poppins;
+  font-size: 19.66px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
 }
 
 .sidebar-logo {
@@ -20,38 +50,75 @@
 .sidebar-item {
   display: flex;
   align-items: center;
-  color: #fff;
+  color: #333;
   text-decoration: none;
   margin-bottom: 15px;
   transition: background-color 0.2s ease;
 }
 
 .sidebar-item:hover {
-  background-color: #555;
+  background-color: rgb(219, 209, 209);
+  color: #2d60ff;
 }
 
 .sidebar-icon {
   margin-right: 10px;
+  width: 20px;
+  height: 20px;
+}
+
+.sidebar-icon:hover {
+  color: #2d60ff;
 }
 
 .sidebar-text {
-  font-size: 16px;
+  color: black;
+  font-family: Inter;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.sidebar-text:hover {
+  color: #2d60ff;
+  font-size: 20px;
+  font-style: bold;
 }
 
 .logout {
   padding: 20px;
+  display: flex;
+  align-items: center;
 }
 
-.sidebar-item > button {
+.sidebar_profile {
+  width: 40px;
+  height: 40px;
+  border-radius: 100px;
+  margin-right: 9px;
+}
+
+.logout div h1 {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  font-size: 14px;
+}
+
+.logout div p {
+  margin-top: 0;
+  padding-top: 3px;
+  font-size: 10px;
+}
+
+.sidebar-item {
   background: none;
   border: none;
-  color: #fff;
+  color: #333;
   cursor: pointer;
   display: flex;
   align-items: center;
   text-decoration: none;
-}
-
-.sidebar-item > button:hover {
-  background-color: #555;
+  padding: 5px;
+  margin-left: 10px;
 }

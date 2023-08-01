@@ -4,13 +4,13 @@ import { BiDownArrowCircle, BiUpArrowCircle } from "react-icons/bi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
+import "./index.css";
 
 const UpdateTransactionForm = ({
   transaction,
   onClose,
   onUpdateTransaction,
 }) => {
-  // State for form fields
   const [transactionName, setTransactionName] = useState(transaction.name);
   const [transactionType, setTransactionType] = useState(transaction.type);
   const [transactionCategory, setTransactionCategory] = useState(
@@ -59,7 +59,8 @@ const UpdateTransactionForm = ({
   return (
     <div className="update_transaction_form">
       <form onSubmit={handleUpdateTransaction}>
-        <h2>Edit Transaction</h2>
+        <h2 className="update_h2">Update Transaction</h2>
+        <p>You can update your transaction here</p>
         {error && <p className="error">{error}</p>}
         <div className="form_group">
           <label htmlFor="name">Transaction Name</label>
@@ -95,7 +96,6 @@ const UpdateTransactionForm = ({
             <option value="entertainment">Entertainment</option>
             <option value="food">Food</option>
             <option value="shopping">Shopping</option>
-            {/* Add other options here */}
           </select>
         </div>
         <div className="form_group">
@@ -120,14 +120,7 @@ const UpdateTransactionForm = ({
         </div>
         <div className="form_group">
           <button type="submit" className="form_update_button">
-            Update Transaction
-          </button>
-          <button
-            type="button"
-            className="form_cancel_button"
-            onClick={onClose}
-          >
-            Cancel
+            Add Transaction
           </button>
         </div>
       </form>
@@ -149,7 +142,7 @@ const UpdateTransaction = ({ transaction, onUpdateTransaction }) => {
     >
       {(close) => (
         <div className="popup-overlay">
-          <div className="popup-content">
+          <div className="update-popup-content">
             <button className="close" onClick={close}>
               &times;
             </button>

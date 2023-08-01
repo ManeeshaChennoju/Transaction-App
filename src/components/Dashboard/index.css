@@ -4,12 +4,23 @@
   width: 100%;
 }
 
-.top_container {
+.dashboard_top_container {
   display: flex;
   justify-content: space-between;
   box-shadow: 0px 1px 1px 1px #f1efef;
-  /* padding: 20px; */
-  padding-top: 5px;
+  padding: 10px;
+  background-color: #fff;
+  position: sticky;
+  top: 0;
+}
+
+.dashboard_top_container h2 {
+  color: #343c6a;
+  font-family: Inter;
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
 }
 
 .add_transaction_button {
@@ -36,7 +47,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: aliceblue;
+  background-color: #fff;
   border-radius: 10px;
   box-shadow: 0px 0px 0px 1px #f1efef;
   padding: 10px 20px 20px 10px;
@@ -44,9 +55,12 @@
 }
 
 .credits div h1 {
-  color: rgb(48, 234, 48);
-  font-weight: bold;
-  font-size: 35px;
+  color: #16dbaa;
+  font-family: Inter;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
 }
 
 .tcb_img {
@@ -58,7 +72,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: aliceblue;
+  background-color: #fff;
   border-radius: 10px;
   box-shadow: 0px 0px 0px 1px #f1efef;
   padding: 10px 20px 20px 10px;
@@ -66,9 +80,12 @@
 }
 
 .debits div h1 {
-  color: rgb(241, 16, 185);
-  font-weight: bold;
-  font-size: 35px;
+  color: #fe5c73;
+  font-family: Inter;
+  font-size: 25px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
 }
 
 .last_transactions_container ul li {
@@ -78,7 +95,14 @@
 }
 
 .last_transactions_container h2 {
-  padding-left: 10px;
+  color: #333b69;
+  font-family: Inter;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  padding-left: 17px;
+  padding-top: 15px;
 }
 
 .items {
@@ -103,9 +127,30 @@
   width: 1110px;
   height: 364px;
   flex-shrink: 0;
-  margin-left: 10px;
+  margin-left: 20px;
+  border-radius: 25px;
+  background: #fff;
+  padding: 20px;
 }
 
-.barchart_container h2 {
-  padding-left: 10px;
+.db_overview_h2 {
+  color: #333b69;
+  font-family: Inter;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  padding-left: 15px;
+  padding-top: 15px;
+}
+
+.barchart_container h4 {
+  color: #333b69;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  padding-left: 15px;
+  padding-bottom: 15px;
 }

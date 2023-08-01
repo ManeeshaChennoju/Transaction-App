@@ -52,6 +52,9 @@ const Dashboard = () => {
   const admin_tcd_url =
     "https://bursting-gelding-24.hasura.app/api/rest/transaction-totals-admin";
 
+  const non_admin_tcd_url =
+    "https://bursting-gelding-24.hasura.app/api/rest/credit-debit-totals";
+
   const fetchAdminData = async () => {
     try {
       const headers = {
@@ -73,8 +76,6 @@ const Dashboard = () => {
     }
   };
 
-  const non_admin_tcd_url =
-    "https://bursting-gelding-24.hasura.app/api/rest/credit-debit-totals";
   const fetchNonAdminData = async () => {
     try {
       if (!currentUser) {
@@ -221,7 +222,7 @@ const Dashboard = () => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-  //   handling add transaction
+  //   handling Add transaction
 
   const handleAddTransaction = async (newTransaction) => {
     try {
@@ -254,7 +255,8 @@ const Dashboard = () => {
     }
   };
 
-  // Function to handle the update API call
+  //   Handling Update transaction
+
   const handleUpdateTransaction = async (updatedTransaction) => {
     try {
       const apiUrl =
@@ -286,7 +288,8 @@ const Dashboard = () => {
     }
   };
 
-  //   handle delete transaction api call
+  //   Handle Delete transaction
+
   const handleDeleteTransaction = async (transactionId) => {
     try {
       const response = await fetch(
@@ -324,7 +327,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard_container">
-      <div className="top_container">
+      <div className="dashboard_top_container">
         <h2>Accounts</h2>
         {!isAdmin && <AddTransaction onAddTransaction={handleAddTransaction} />}
       </div>
@@ -415,9 +418,8 @@ const Dashboard = () => {
             ))}
         </ul>
       </div>
-
+      <h2 className="db_overview_h2">Debit & Credit Overview</h2>
       <div className="barchart_container">
-        <h2>Debit & Credit Overview</h2>
         <h4 style={{ marginBottom: "10px" }}>
           {`$${totalDebitBarchart} Debited & $${totalCreditBarchart} Credited in this Week`}
         </h4>
