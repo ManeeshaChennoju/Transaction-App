@@ -37,8 +37,6 @@
   }
 }
 
-/* add here more styles */
-
 /* app.css */
 body {
   font-family: Arial, sans-serif;
@@ -137,7 +135,6 @@ body {
   background-color: #555;
 }
 
-/* Styling for active link in sidebar */
 .sidebar-item.active {
   background-color: #555;
 }
