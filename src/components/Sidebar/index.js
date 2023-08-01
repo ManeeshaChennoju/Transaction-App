@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { FiHome, FiUser, FiLogOut } from "react-icons/fi";
 import { AiOutlineTransaction } from "react-icons/ai";
 import { useAuth } from "../../AuthContext";
+import Logout from "../Logout";
 
 import "./index.css";
 
@@ -121,7 +122,7 @@ const users = [
   },
 ];
 
-const Sidebar = ({ onLogout }) => {
+const Sidebar = () => {
   const { isAdmin, currentUser } = useAuth();
   const [profileData, setProfileData] = useState(null);
 
@@ -210,53 +211,13 @@ const Sidebar = ({ onLogout }) => {
           <h1>User</h1>
           <p>{userEmail}</p>
         </div>
-        <button onClick={onLogout} className="sidebar-item">
+        {/* <button onClick={onLogout} className="sidebar-item">
           <FiLogOut className="sidebar-icon" size={20} />
-        </button>
+        </button> */}
+        <Logout />
       </div>
     </div>
   );
 };
 
 export default Sidebar;
-
-// <Link className="sidebar">
-//   <div className="sidebar_logo_container">
-//     <img
-//       src="https://res.cloudinary.com/dtnhhgwlo/image/upload/v1690920125/Group_2_si9bjy.png"
-//       alt="Logo"
-//       className="sidebar-logo"
-//     />
-//     <h1 className="Money">Money </h1>
-//     <h1 className="Matters">Matters</h1>
-//   </div>
-//   <Link className="sidebar-menu">
-//     <Link to="/dashboard" className="sidebar-item">
-//       <FiHome className="sidebar-icon" />
-//       <span className="sidebar-text">Dashboard</span>
-//     </Link>
-//     <Link
-//       to={isAdmin ? "/all-transactions" : "/transactions"}
-//       className="sidebar-item"
-//     >
-//       <AiOutlineTransaction className="sidebar-icon" />
-//       <span className="sidebar-text">
-//         {isAdmin ? "All Transactions" : "Transactions"}
-//       </span>
-//     </Link>
-//     <Link to="/profile" className="sidebar-item">
-//       <FiUser className="sidebar-icon" />
-//       <span className="sidebar-text">Profile</span>
-//     </Link>
-//   </Link>
-//   <div className="logout">
-//     <img src={profileImage} alt="Profile" className="sidebar_profile" />
-//     <div>
-//       <h1>User</h1>
-//       <p>{userEmail}</p>
-//     </div>
-//     <button onClick={onLogout} className="sidebar-item">
-//       <FiLogOut className="sidebar-icon" size={20} />
-//     </button>
-//   </div>
-// </Link>
