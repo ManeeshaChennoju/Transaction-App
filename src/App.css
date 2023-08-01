@@ -107,13 +107,12 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 300px;
+  max-width: 500px;
 }
 
 .login-input {
   padding: 10px;
   margin-bottom: 10px;
-  /* width: 100%; */
   border: 1px solid #ccc;
   border-radius: 5px;
 }
