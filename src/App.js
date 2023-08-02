@@ -49,7 +49,7 @@ const App = () => {
         <div className="content-container">
           {isLoggedIn ? (
             <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" />} />
+              <Route path="/" element={<Navigate to="/dashboard"/>} />
               <Route
                 path="/dashboard"
                 element={<Dashboard currentUser={currentUser} />}

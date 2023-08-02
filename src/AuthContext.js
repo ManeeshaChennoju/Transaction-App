@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext } from "react";
+import { Navigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -42,6 +43,7 @@ const AuthProvider = ({ children }) => {
         setCurrentUser(userId);
         setIsLoggedIn(true);
         setError("");
+        return <Navigate to="/dashboard" />;
       } else {
         setError("Invalid credentials. Please try again.");
         setIsLoggedIn(false); // Set isLoggedIn to false
