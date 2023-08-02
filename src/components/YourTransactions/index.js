@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactLoading from "react-loading";
 import { format } from "date-fns";
 import { useAuth } from "../../AuthContext";
 import { GrEdit } from "react-icons/gr";
@@ -16,6 +17,18 @@ const YourTransactions = () => {
   const [transactions, setTransactions] = useState([]);
   const { isAdmin, currentUser } = useAuth();
   const [tabValue, setTabValue] = useState(0);
+
+  //  API status views
+  const apiStatusViews = {
+    success: "SUCCESS",
+    loading: "LOADING",
+    failure: "FAILURE",
+  };
+
+  // State to manage API status
+  const [transactionApiStatus, setTransactionApiStatus] = useState(
+    apiStatusViews.loading
+  );
 
   // Function to format date
   const formatDate = (dateString) => {
@@ -54,9 +67,108 @@ const YourTransactions = () => {
       const response = await fetch(apiUrl, { headers });
       const data = await response.json();
       console.log("Your Transactions Data------", data);
+      setTransactionApiStatus(apiStatusViews.success);
       setTransactions(data.transactions);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setTransactionApiStatus(apiStatusViews.failure);
+    }
+  };
+
+  const failureUrl =
+    "https://img.freepik.com/premium-vector/payment-error-info-message-isometric-concept-customer-cross-marks-failure_106788-2319.jpg?w=1060";
+
+  const renderTransactionApiViews = () => {
+    switch (transactionApiStatus) {
+      case apiStatusViews.loading:
+        return (
+          <div data-testid="loader" className="loader_container">
+            <ReactLoading type="spin" color="blue" height={40} width={40} />
+          </div>
+        );
+      case apiStatusViews.failure:
+        return (
+          <div>
+            <img src={failureUrl} alt="Failure" width={50} />
+            <p>Failed to load data. Please try again later.</p>
+          </div>
+        );
+      case apiStatusViews.success:
+        return (
+          <div className="table_container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Transaction Name</th>
+                  <th>Category</th>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th colSpan="2"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredTransactions &&
+                  filteredTransactions.map((transaction) => (
+                    <React.Fragment key={transaction.id}>
+                      <tr>
+                        <td>
+                          {transaction.type === "credit" ? (
+                            <BiUpArrowCircle
+                              className="arrows"
+                              style={{ color: getIconColor(transaction.type) }}
+                            />
+                          ) : (
+                            <BiDownArrowCircle
+                              className="arrows"
+                              style={{ color: getIconColor(transaction.type) }}
+                            />
+                          )}
+                          <span className="transaction_name">
+                            {capitalizeFirstLetter(
+                              transaction.transaction_name
+                            )}
+                          </span>
+                        </td>
+                        <td>{capitalizeFirstLetter(transaction.category)}</td>
+                        <td>{formatDate(transaction.date)}</td>
+                        <td style={{ color: getAmountColor(transaction.type) }}>
+                          -${transaction.amount}
+                        </td>
+                        <td>
+                          {isAdmin ? (
+                            <button type="button" className="edit_button">
+                              <GrEdit size={18} />
+                            </button>
+                          ) : (
+                            <UpdateTransaction
+                              transaction={transaction}
+                              onUpdateTransaction={handleUpdateTransaction}
+                            />
+                          )}
+                          {isAdmin ? (
+                            <button type="button" className="delete_button">
+                              <RiDeleteBinLine
+                                size={19}
+                                style={{ color: "red" }}
+                              />
+                            </button>
+                          ) : (
+                            <DeleteTransaction
+                              transaction={transaction}
+                              onDeleteTransaction={handleDeleteTransaction}
+                            />
+                          )}
+                        </td>
+                      </tr>
+                    </React.Fragment>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        );
+
+      default:
+        return null;
     }
   };
 
@@ -84,27 +196,9 @@ const YourTransactions = () => {
         alert("Transaction added successfully!");
       }
 
-      fetchData(); // Fetching updated transactions after successful addition
-    } catch (error) {
-      console.error("Error adding transaction:", error);
-    }
-  };
-
-  const handleDelete = async (transactionId) => {
-    try {
-      // Make API call to delete transaction by ID
-      await fetch(
-        `https://bursting-gelding-24.hasura.app/api/rest/delete-transaction/${transactionId}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      // Show toast message on successful deletion
-      // Fetch updated transactions after deletion
       fetchData();
     } catch (error) {
-      console.error("Error deleting transaction:", error);
+      console.error("Error adding transaction:", error);
     }
   };
 
@@ -193,9 +287,6 @@ const YourTransactions = () => {
       <div className="container">
         <div className="top_container">
           <h2>Transactions</h2>
-          {/* <button type="button" className="add_transaction_button">
-            + Add Transaction
-          </button> */}
           <AddTransaction onAddTransaction={handleAddTransaction} />
         </div>
         <Tabs
@@ -209,71 +300,7 @@ const YourTransactions = () => {
           <Tab label="Debit" />
         </Tabs>
       </div>
-      <div className="table_container">
-        <table>
-          <thead>
-            <tr>
-              <th>Transaction Name</th>
-              <th>Category</th>
-              <th>Date</th>
-              <th>Amount</th>
-              <th colSpan="2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredTransactions &&
-              filteredTransactions.map((transaction) => (
-                <React.Fragment key={transaction.id}>
-                  <tr>
-                    <td>
-                      {transaction.type === "credit" ? (
-                        <BiUpArrowCircle
-                          className="arrows"
-                          style={{ color: getIconColor(transaction.type) }}
-                        />
-                      ) : (
-                        <BiDownArrowCircle
-                          className="arrows"
-                          style={{ color: getIconColor(transaction.type) }}
-                        />
-                      )}
-                      <span className="transaction_name">
-                        {capitalizeFirstLetter(transaction.transaction_name)}
-                      </span>
-                    </td>
-                    <td>{capitalizeFirstLetter(transaction.category)}</td>
-                    <td>{formatDate(transaction.date)}</td>
-                    <td style={{ color: getAmountColor(transaction.type) }}>
-                      -${transaction.amount}
-                    </td>
-                    <td>
-                      {isAdmin ? (
-                        <button type="button" className="edit_button">
-                          <GrEdit size={18} />
-                        </button>
-                      ) : (
-                        <UpdateTransaction
-                          transaction={transaction}
-                          onUpdateTransaction={handleUpdateTransaction}
-                        />
-                      )}
-                      {isAdmin ? (
-                        <button type="button" className="delete_button">
-                          <RiDeleteBinLine size={19} style={{ color: "red" }} />
-                        </button>
-                      ) : (
-                        <DeleteTransaction
-                          transaction={transaction}
-                          onDeleteTransaction={handleDeleteTransaction}
-                        />
-                      )}
-                    </td>
-                  </tr>
-                </React.Fragment>
-              ))}
-          </tbody>
-        </table>
-      </div>
+      {renderTransactionApiViews()}
     </div>
   );
 };

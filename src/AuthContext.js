@@ -6,6 +6,8 @@ const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const login = async (email, password) => {
@@ -41,7 +43,6 @@ const AuthProvider = ({ children }) => {
         setIsLoggedIn(true);
         setError("");
       } else {
-        // Invalid credentials
         setError("Invalid credentials. Please try again.");
         setIsLoggedIn(false); // Set isLoggedIn to false
       }
@@ -56,11 +57,25 @@ const AuthProvider = ({ children }) => {
     setIsLoggedIn(false);
     setIsAdmin(false);
     setCurrentUser(null);
+    setEmail("");
+    setPassword("");
   };
 
   return (
     <AuthContext.Provider
-      value={{ currentUser, isAdmin, isLoggedIn, login, logout, error }}
+      value={{
+        currentUser,
+        isAdmin,
+        isLoggedIn,
+        login,
+        logout,
+        email,
+        setEmail,
+        password,
+        setPassword,
+        error,
+        setError,
+      }}
     >
       {children}
     </AuthContext.Provider>

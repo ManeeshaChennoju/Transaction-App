@@ -14,10 +14,19 @@ import "./App.css";
 import { AuthProvider, useAuth } from "./AuthContext";
 
 const App = () => {
-  const { isAdmin, isLoggedIn, login, logout, currentUser } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const {
+    isAdmin,
+    isLoggedIn,
+    login,
+    logout,
+    currentUser,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    error,
+    setError,
+  } = useAuth();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -29,6 +38,8 @@ const App = () => {
 
   const handleLogout = () => {
     logout();
+    setEmail("");
+    setPassword("");
   };
 
   return (

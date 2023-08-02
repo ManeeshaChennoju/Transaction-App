@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
+import ReactLoading from "react-loading";
 import { useAuth } from "../../AuthContext";
 import { BiDownArrowCircle, BiUpArrowCircle } from "react-icons/bi";
 import Tabs from "@material-ui/core/Tabs";
@@ -126,6 +127,18 @@ const AllTransactions = () => {
   const { currentUser } = useAuth();
   const [tabValue, setTabValue] = useState(0);
 
+  //  API status views
+  const apiStatusViews = {
+    success: "SUCCESS",
+    loading: "LOADING",
+    failure: "FAILURE",
+  };
+
+  // State to manage API status
+  const [transactionApiStatus, setTransactionApiStatus] = useState(
+    apiStatusViews.loading
+  );
+
   // Function to format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -163,9 +176,90 @@ const AllTransactions = () => {
       const response = await fetch(apiUrl, { headers });
       const data = await response.json();
       console.log("All admin Transactions Data------", data);
+      setTransactionApiStatus(apiStatusViews.success);
       setTransactions(data.transactions);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setTransactionApiStatus(apiStatusViews.failure);
+    }
+  };
+
+  const failureUrl =
+    "https://img.freepik.com/premium-vector/payment-error-info-message-isometric-concept-customer-cross-marks-failure_106788-2319.jpg?w=1060";
+
+  const renderTransactionApiViews = () => {
+    switch (transactionApiStatus) {
+      case apiStatusViews.loading:
+        return (
+          <div data-testid="loader" className="loader_container">
+            <ReactLoading type="spin" color="blue" height={40} width={40} />
+          </div>
+        );
+      case apiStatusViews.failure:
+        return (
+          <div>
+            <img src={failureUrl} alt="Failure" width={50} />
+            <p>Failed to load data. Please try again later.</p>
+          </div>
+        );
+      case apiStatusViews.success:
+        return (
+          <div className="table_container">
+            <table>
+              <thead>
+                <tr>
+                  <th>User Name</th>
+                  <th>Transaction Name</th>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                  <th colSpan="2"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredTransactions.map((transaction) => {
+                  const user = users.find(
+                    (user) => user.userId === transaction.user_id
+                  );
+                  const profileImgUrl =
+                    user?.profileImg || defaultProfileImgUrl;
+                  const userName = user?.username || "User";
+                  return (
+                    <tr key={transaction.id}>
+                      <td className="arrow-icon">
+                        {transaction.type === "credit" ? (
+                          <BiUpArrowCircle color="red" size={27} />
+                        ) : (
+                          <BiDownArrowCircle color="green" size={27} />
+                        )}
+                        <img
+                          src={profileImgUrl}
+                          alt="Profile"
+                          className="profile-image"
+                        />
+                        <span className="user-name">
+                          {capitalizeFirstLetter(userName)}
+                        </span>
+                      </td>
+                      <td>
+                        {capitalizeFirstLetter(transaction.transaction_name)}
+                      </td>
+                      <td>{capitalizeFirstLetter(transaction.category)}</td>
+                      <td style={{ color: getAmountColor(transaction.type) }}>
+                        {transaction.type === "debit" ? "-" : ""}
+                        {transaction.amount}
+                      </td>
+                      <td>{formatDate(transaction.date)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        );
+
+      default:
+        return null;
     }
   };
 
@@ -200,55 +294,7 @@ const AllTransactions = () => {
           <Tab label="Debit" />
         </Tabs>
       </div>
-      <div className="table_container">
-        <table>
-          <thead>
-            <tr>
-              <th>User Name</th>
-              <th>Transaction Name</th>
-              <th>Category</th>
-              <th>Amount</th>
-              <th>Date</th>
-              <th colSpan="2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredTransactions.map((transaction) => {
-              const user = users.find(
-                (user) => user.userId === transaction.user_id
-              );
-              const profileImgUrl = user?.profileImg || defaultProfileImgUrl;
-              const userName = user?.username || "User";
-              return (
-                <tr key={transaction.id}>
-                  <td className="arrow-icon">
-                    {transaction.type === "credit" ? (
-                      <BiUpArrowCircle color="red" size={27} />
-                    ) : (
-                      <BiDownArrowCircle color="green" size={27} />
-                    )}
-                    <img
-                      src={profileImgUrl}
-                      alt="Profile"
-                      className="profile-image"
-                    />
-                    <span className="user-name">
-                      {capitalizeFirstLetter(userName)}
-                    </span>
-                  </td>
-                  <td>{capitalizeFirstLetter(transaction.transaction_name)}</td>
-                  <td>{capitalizeFirstLetter(transaction.category)}</td>
-                  <td style={{ color: getAmountColor(transaction.type) }}>
-                    {transaction.type === "debit" ? "-" : ""}
-                    {transaction.amount}
-                  </td>
-                  <td>{formatDate(transaction.date)}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      {renderTransactionApiViews()}
     </div>
   );
 };

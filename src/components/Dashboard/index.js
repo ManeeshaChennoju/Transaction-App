@@ -1,5 +1,6 @@
-import { format, parseISO } from "date-fns";
 import React, { useState, useEffect } from "react";
+import ReactLoading from "react-loading";
+import { format, parseISO } from "date-fns";
 import {
   BarChart,
   Bar,
@@ -20,10 +21,31 @@ import UpdateTransaction from "../UpdateTransaction";
 import DeleteTransaction from "../DeleteTransaction";
 
 import "./index.css";
+
+const failureUrl =
+  "https://img.freepik.com/premium-vector/payment-error-info-message-isometric-concept-customer-cross-marks-failure_106788-2319.jpg?w=1060";
+
 const Dashboard = () => {
   const { isAdmin, currentUser } = useAuth();
   console.log("dashboard-----is admin-----", isAdmin);
   console.log("dashboard------", currentUser);
+
+  //  API status views
+  const apiStatusViews = {
+    success: "SUCCESS",
+    loading: "LOADING",
+    failure: "FAILURE",
+  };
+
+  // State to manage API status
+  const [
+    recentTransactionsApiStatus,
+    setRecentTransactionsApiStatus,
+  ] = useState(apiStatusViews.loading);
+
+  const [chartDataApiStatus, setChartDataApiStatus] = useState(
+    apiStatusViews.loading
+  );
 
   const [totalCredit, setTotalCredit] = useState(0);
   const [totalDebit, setTotalDebit] = useState(0);
@@ -69,10 +91,8 @@ const Dashboard = () => {
       console.log("Admin Data:", data);
       setTotalCredit(calculateTotalCredit(data.transaction_totals_admin));
       setTotalDebit(calculateTotalDebit(data.transaction_totals_admin));
-      // Rest of the code to handle the data
     } catch (error) {
       console.error("Error fetching data:", error);
-      // Handle error, show error message to the user, etc.
     }
   };
 
@@ -121,8 +141,95 @@ const Dashboard = () => {
       console.log("transactions:", data);
       const transactions = data.transactions;
       setRecentTransactions(transactions);
+      setRecentTransactionsApiStatus(apiStatusViews.success);
     } catch (error) {
       console.error("Error fetching recent transactions:", error);
+      setRecentTransactionsApiStatus(apiStatusViews.failure);
+    }
+  };
+
+  const renderRecentTransactionApiView = () => {
+    switch (recentTransactionsApiStatus) {
+      case apiStatusViews.loading:
+        return (
+          <div data-testid="loader" className="loader_container">
+            <ReactLoading type="spin" color="blue" height={40} width={40} />
+          </div>
+        );
+      case apiStatusViews.failure:
+        return (
+          <div>
+            <img src={failureUrl} alt="Failure" width={50} />
+            <p>Failed to load data. Please try again later.</p>
+          </div>
+        );
+      case apiStatusViews.success:
+        return (
+          <div className="last_transactions_container">
+            <h2>Last Transaction </h2>
+            <ul>
+              {recentTransactions &&
+                recentTransactions.map((transaction) => (
+                  <React.Fragment key={transaction.id}>
+                    <li key={transaction.id}>
+                      <p>
+                        {transaction.type === "credit" ? (
+                          <BiUpArrowCircle
+                            size={28}
+                            style={{ color: getIconColor(transaction.type) }}
+                          />
+                        ) : (
+                          <BiDownArrowCircle
+                            size={28}
+                            style={{ color: getIconColor(transaction.type) }}
+                          />
+                        )}
+                      </p>
+                      <p className="items">
+                        {capitalizeFirstLetter(transaction.transaction_name)}
+                      </p>
+                      <p className="items">
+                        {capitalizeFirstLetter(transaction.category)}
+                      </p>
+                      <p className="items">{formatDate(transaction.date)}</p>
+                      <p
+                        className="items"
+                        style={{ color: getAmountColor(transaction.type) }}
+                      >
+                        -${transaction.amount}
+                      </p>
+
+                      {isAdmin ? (
+                        <button type="button" className="edit_button">
+                          <GrEdit size={18} />
+                        </button>
+                      ) : (
+                        <UpdateTransaction
+                          transaction={transaction}
+                          onUpdateTransaction={handleUpdateTransaction}
+                        />
+                      )}
+
+                      {isAdmin ? (
+                        <button type="button" className="delete_button">
+                          <RiDeleteBinLine size={19} style={{ color: "red" }} />
+                        </button>
+                      ) : (
+                        <DeleteTransaction
+                          transaction={transaction}
+                          onDeleteTransaction={handleDeleteTransaction}
+                        />
+                      )}
+                    </li>
+                    <hr />
+                  </React.Fragment>
+                ))}
+            </ul>
+          </div>
+        );
+
+      default:
+        return null;
     }
   };
 
@@ -188,11 +295,11 @@ const Dashboard = () => {
       const processedData = isAdmin
         ? data.last_7_days_transactions_totals_admin.map((item) => ({
             date: formatDate(parseISO(item.date), "eee"),
-            [item.type]: item.sum, // Dynamically set the credit/debit based on the type
+            [item.type]: item.sum,
           }))
         : data.last_7_days_transactions_credit_debit_totals.map((item) => ({
             date: formatDate(parseISO(item.date), "eee"),
-            [item.type]: item.sum, // Dynamically set the credit/debit based on the type
+            [item.type]: item.sum,
           }));
 
       // Calculate the total credit and total debit sums separately
@@ -207,14 +314,56 @@ const Dashboard = () => {
           totalDebitSum += item.debit;
         }
       });
-
+      setChartDataApiStatus(apiStatusViews.success);
       setTotalCreditBarchart(totalCreditSum);
       setTotalDebitBarchart(totalDebitSum);
-
       setChartData(processedData);
     } catch (error) {
       console.error("Error fetching bar chart data:", error);
-      // Handle error, show error message to the user, etc.
+      setChartDataApiStatus(apiStatusViews.failure);
+    }
+  };
+
+  const renderChartDataApiViews = () => {
+    switch (chartDataApiStatus) {
+      case apiStatusViews.loading:
+        return (
+          <div data-testid="loader" className="loader_container">
+            <ReactLoading type="spin" color="blue" height={40} width={40} />
+          </div>
+        );
+      case apiStatusViews.failure:
+        return (
+          <div className="failure_container">
+            <img src={failureUrl} alt="Failure" width={50} />
+            <p>Failed to load data. Please try again later.</p>
+          </div>
+        );
+
+      case apiStatusViews.success:
+        return (
+          <div className="barchart_container">
+            <h4 style={{ marginBottom: "10px" }}>
+              {`$${totalDebitBarchart} Debited & $${totalCreditBarchart} Credited in this Week`}
+            </h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart width={500} height={400} data={chartData}>
+                <CartesianGrid strokeDasharray="2 2" />
+                <XAxis
+                  dataKey="date"
+                  tickFormatter={(value) => value.toUpperCase()}
+                />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="credit" stackId="a" fill="#FCAA0B" />
+                <Bar dataKey="debit" stackId="a" fill="#4D78FF" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        );
+      default:
+        return null;
     }
   };
 
@@ -356,88 +505,9 @@ const Dashboard = () => {
           />
         </div>
       </div>
-
-      <div className="last_transactions_container">
-        <h2>Last Transaction </h2>
-        <ul>
-          {recentTransactions &&
-            recentTransactions.map((transaction) => (
-              <React.Fragment key={transaction.id}>
-                <li key={transaction.id}>
-                  <p>
-                    {transaction.type === "credit" ? (
-                      <BiUpArrowCircle
-                        size={28}
-                        style={{ color: getIconColor(transaction.type) }}
-                      />
-                    ) : (
-                      <BiDownArrowCircle
-                        size={28}
-                        style={{ color: getIconColor(transaction.type) }}
-                      />
-                    )}
-                  </p>
-                  <p className="items">
-                    {capitalizeFirstLetter(transaction.transaction_name)}
-                  </p>
-                  <p className="items">
-                    {capitalizeFirstLetter(transaction.category)}
-                  </p>
-                  <p className="items">{formatDate(transaction.date)}</p>
-                  <p
-                    className="items"
-                    style={{ color: getAmountColor(transaction.type) }}
-                  >
-                    -${transaction.amount}
-                  </p>
-
-                  {isAdmin ? (
-                    <button type="button" className="edit_button">
-                      <GrEdit size={18} />
-                    </button>
-                  ) : (
-                    <UpdateTransaction
-                      transaction={transaction}
-                      onUpdateTransaction={handleUpdateTransaction}
-                    />
-                  )}
-
-                  {isAdmin ? (
-                    <button type="button" className="delete_button">
-                      <RiDeleteBinLine size={19} style={{ color: "red" }} />
-                    </button>
-                  ) : (
-                    <DeleteTransaction
-                      transaction={transaction}
-                      onDeleteTransaction={handleDeleteTransaction}
-                    />
-                  )}
-                </li>
-                <hr />
-              </React.Fragment>
-            ))}
-        </ul>
-      </div>
+      {renderRecentTransactionApiView()}
       <h2 className="db_overview_h2">Debit & Credit Overview</h2>
-      <div className="barchart_container">
-        <h4 style={{ marginBottom: "10px" }}>
-          {`$${totalDebitBarchart} Debited & $${totalCreditBarchart} Credited in this Week`}
-        </h4>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart width={500} height={400} data={chartData}>
-            <CartesianGrid strokeDasharray="2 2" />
-            <XAxis
-              dataKey="date"
-              tickFormatter={(value) => value.toUpperCase()}
-            />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="credit" stackId="a" fill="#FCAA0B" />
-            <Bar dataKey="debit" stackId="a" fill="#4D78FF" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      {renderChartDataApiViews()}
     </div>
   );
 };

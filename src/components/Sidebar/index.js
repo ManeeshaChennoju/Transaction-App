@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { FiHome, FiUser, FiLogOut } from "react-icons/fi";
 import { AiOutlineTransaction } from "react-icons/ai";
 import { useAuth } from "../../AuthContext";
-import Logout from "../Logout";
+import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
 
 import "./index.css";
 
@@ -123,8 +124,21 @@ const users = [
 ];
 
 const Sidebar = () => {
-  const { isAdmin, currentUser } = useAuth();
+  const {
+    isAdmin,
+    currentUser,
+    logout,
+    email,
+    setEmail,
+    password,
+    setPassword,
+  } = useAuth();
   const [profileData, setProfileData] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   useEffect(() => {
     fetchData();
@@ -211,10 +225,66 @@ const Sidebar = () => {
           <h1>User</h1>
           <p>{userEmail}</p>
         </div>
-        {/* <button onClick={onLogout} className="sidebar-item">
-          <FiLogOut className="sidebar-icon" size={20} />
-        </button> */}
-        <Logout />
+        <Popup
+          trigger={
+            <button className="sidebar-item" onClick={() => setShowPopup(true)}>
+              <FiLogOut className="sidebar-icon" size={20} />
+            </button>
+          }
+          open={showPopup}
+          modal
+          closeOnDocumentClick={false}
+          onClose={() => setShowPopup(false)}
+        >
+          {(close) => (
+            <div className="logout-popup-overlay">
+              <div className="logout-popup-content">
+                <button className="close" onClick={close}>
+                  &times;
+                </button>
+                <div className="popup-body">
+                  <div className="round1">
+                    <div className="round2">
+                      <FiLogOut size={30} color="#D97706" />
+                    </div>
+                  </div>
+                  <div className="logout_content">
+                    <h2 className="logout_h2">
+                      Are you sure you want to Logout?
+                    </h2>
+                    <p>
+                      You will be logged out of the application. Do you want to
+                      continue?
+                    </p>
+
+                    <div className="logout-popup-actions">
+                      <button
+                        type="button"
+                        className="popup-confirm"
+                        onClick={() => {
+                          handleLogout();
+                          close();
+                        }}
+                      >
+                        Yes, Logout
+                      </button>
+                      <button
+                        type="button"
+                        className="popup-cancel"
+                        onClick={() => {
+                          setShowPopup(false);
+                          close();
+                        }}
+                      >
+                        No, Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </Popup>
       </div>
     </div>
   );
